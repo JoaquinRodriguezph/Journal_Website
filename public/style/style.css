@@ -1,0 +1,48 @@
+/* General Body Styling */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa; /* A slightly off-white for a softer look */
+}
+
+/* Custom styles for login/register cards for a bit more flair */
+.card.shadow-lg {
+    border: none;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card.shadow-lg:hover {
+    transform: translateY(-5px);
+}
+
+/* Ensure the sticky profile sidebar works as intended on larger screens */
+@media (min-width: 768px) {
+    .profile-sidebar {
+        position: sticky;
+        top: 20px;
+        height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+}
+
+/* Style for the badge colors to be more distinct */
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000;
+}
+
+/* Minor tweak for buttons to feel more interactive */
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

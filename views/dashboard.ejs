@@ -1,0 +1,137 @@
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Left Column: User Profile (This part remains the same) -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <img src="<%= user.profilePicture %>" alt="Profile Picture" class="rounded-circle mb-3" width="120" height="120">
+                    <h4 class="card-title"><%= user.name %></h4>
+                    <p class="text-muted"><%= user.email %></p>
+                    <p class="card-text"><%= user.description || 'No description yet.' %></p>
+                    <% if (user.dateOfBirth) { %>
+                        <p class="card-text"><small>Born: <%= new Date(user.dateOfBirth).toLocaleDateString() %></small></p>
+                    <% } %>
+                    <button type="button" class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        Edit Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Journal Entries -->
+        <div class="col-md-8">
+            <!-- New Entry Form (This part remains the same) -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Create New Entry</h5>
+                    <form action="/entries" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="title" placeholder="Entry Title" required>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" name="content" rows="4" placeholder="What's on your mind?" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="photo" class="form-label">Add a photo (optional)</label>
+                            <input class="form-control" type="file" id="photo" name="photo">
+                        </div>
+                        <button type="submit" class="btn btn-success">Post Entry</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Existing Entries Feed -->
+            <h3 class="mb-3">Your Journal</h3>
+            <% if (entries.length === 0) { %>
+                <div class="text-center text-muted p-5">
+                    <p>Your journal is empty. Write your first entry above!</p>
+                </div>
+            <% } else { %>
+                <% entries.forEach(entry => { %>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                             <% if (entry.photo) { %>
+                                <img src="<%= entry.photo %>" class="img-fluid rounded mb-3" alt="Journal Photo">
+                            <% } %>
+                            <h5 class="card-title"><%= entry.title %></h5>
+                            <p class="card-text"><%= entry.content %></p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Posted on <%= new Date(entry.createdAt).toLocaleString() %></small>
+                                <!-- NEW: Action buttons now include Edit -->
+                                <div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editEntryModal-<%= entry._id %>">
+                                        Edit
+                                    </button>
+                                    <form action="/entries/delete/<%= entry._id %>" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Edit Entry Modal (Generated for each entry) -->
+                    <div class="modal fade" id="editEntryModal-<%= entry._id %>" tabindex="-1" aria-labelledby="editEntryModalLabel-<%= entry._id %>" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="editEntryModalLabel-<%= entry._id %>">Edit Entry</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <form action="/entries/edit/<%= entry._id %>" method="POST">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="title-<%= entry._id %>" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="title-<%= entry._id %>" name="title" value="<%= entry.title %>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="content-<%= entry._id %>" class="form-label">Content</label>
+                                    <textarea class="form-control" id="content-<%= entry._id %>" name="content" rows="5" required><%= entry.content %></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- (The Edit Profile Modal remains at the end, unchanged) -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProfileModalLabel">Edit Your Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/profile" method="POST" enctype="multipart/form-data">
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="<%= user.name %>">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3"><%= user.description %></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="profilePicture" class="form-label">Change Profile Picture</label>
+                <input class="form-control" type="file" id="profilePicture" name="profilePicture">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
